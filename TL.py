@@ -43,7 +43,7 @@ class TL:
         with open(filename, 'r') as f:
            TL_dict = json.load(f)
 
-        # Read constructors
+       # Read constructors
 
         self.constructors = TL_dict['constructors']
         self.constructor_id = {}
@@ -61,9 +61,8 @@ class TL:
             self.method_id[z.id] = z
             self.method_name[z.method] = z
 
-
 ## Loading TL_schema (should be placed in the same directory as mtproto.py
-tl = TL(os.path.join(os.path.dirname(__file__), "TL_schema.JSON"))
+tl = TL(os.path.join(os.path.dirname(os.path.abspath(__file__), "TL_Schema.JSON"))
 
 
 def serialize_obj(type_, **kwargs):
@@ -88,7 +87,6 @@ def serialize_method(type_, **kwargs):
     for arg in tl_method.params:
         serialize_param(bytes_io, type_=arg['type'], value=kwargs[arg['name']])
     return bytes_io.getvalue()
-
 
 def serialize_param(bytes_io, type_, value):
     if type_ == "int":

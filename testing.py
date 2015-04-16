@@ -25,3 +25,5 @@ Session.create_auth_key()
 
 future_salts = Session.method_call('get_future_salts', num=3)
 print(future_salts)
+# pi_ng = Session.method_call('ping', ping_id=12345)
+# print(pi_ng.name)
