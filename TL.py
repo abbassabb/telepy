@@ -63,7 +63,7 @@ class TL:
 
 
 ## Loading TL_schema (should be placed in the same directory as mtproto.py
-tl = TL(os.path.join(os.path.dirname(__file__), "TL_schema.JSON"))
+tl = TL(os.path.join(os.path.abspath(os.path.dirname(__file__)), "TL_schema.JSON"))
 
 
 def serialize_obj(type_, **kwargs):
