@@ -3,6 +3,7 @@ import os
 import struct
 import json
 import io
+import logging
 from numbers import Number
 
 class TlConstructor:
@@ -34,9 +35,13 @@ class TlMethod:
         self.params = json_dict['params']
 
 
-class TLObject(dict):
+class TLObject(dict): # pseudo immutable dict
     def __init__(self, tl_elem):
         self.name = tl_elem.predicate
+    # def __setitem__(self, key, value):  
+    #    raise Exception("Can't modify TLObject")
+    # def __hash__(self): # constant hash value
+    #    return hash(tuple(sorted(self.items())))
 
 class TL:
     def __init__(self, filename):
@@ -64,6 +69,7 @@ class TL:
 
 ## Loading TL_schema (should be placed in the same directory as mtproto.py
 tl = TL(os.path.join(os.path.abspath(os.path.dirname(__file__)), "TL_schema.JSON"))
+## tl = TL(os.path.join(os.path.abspath(os.path.dirname(__file__)), "full_TL_schema.JSON"))
 
 
 def serialize_obj(type_, **kwargs):
@@ -81,6 +87,7 @@ def serialize_obj(type_, **kwargs):
 def serialize_method(type_, **kwargs):
     bytes_io = io.BytesIO()
     try:
+        # print("Select type %s", type_)
         tl_method = tl.method_name[type_]
     except KeyError:
         raise Exception("Could not extract type: %s" % type_)
@@ -112,17 +119,23 @@ def serialize_param(bytes_io, type_, value):
             bytes_io.write(struct.pack('<i', l)[:3])  # 3 bytes of string
             bytes_io.write(value) # string
             bytes_io.write(b'\x00'*(-l % 4))  # padding bytes
-
+    else:
+        raise Exception("Unknown type")
+            
 def deserialize(bytes_io, type_=None, subtype=None):
     """
     :type bytes_io: io.BytesIO object
     """
+    # logging.debug('Deserialize with type=%s and subtype=%s', type_, subtype)
+
+    # print('Deserialize with type=%s and subtype=%s'%(type_, subtype))
+    
     assert isinstance(bytes_io, io.BytesIO)
 
     # Built-in bare types
-    if   type_ == 'int':    x = struct.unpack('<i', bytes_io.read(4))[0]
-    elif type_ == '#':      x = struct.unpack('<I', bytes_io.read(4))[0]
-    elif type_ == 'long':   x = struct.unpack('<q', bytes_io.read(8))[0]
+    if   type_ == 'int': x = struct.unpack('<i', bytes_io.read(4))[0]
+    elif type_ == '#': x = struct.unpack('<I', bytes_io.read(4))[0]
+    elif type_ == 'long': x = struct.unpack('<q', bytes_io.read(8))[0]
     elif type_ == 'double': x = struct.unpack('<d', bytes_io.read(8))[0]
     elif type_ == 'int128': x = bytes_io.read(16)
     elif type_ == 'int256': x = bytes_io.read(32)

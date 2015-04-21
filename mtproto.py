@@ -130,6 +130,7 @@ class Session:
         return data
 
     def method_call(self, method, **kwargs):
+        print 'call %s' % method
         for i in range(1, self.MAX_RETRY):
             try:
                 self.send_message(TL.serialize_method(method, **kwargs))

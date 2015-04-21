@@ -65,3 +65,10 @@ rsa.pub
 \#*#
 .#*#
 .#*
+
+# tmp files
+tmp
+full_TL_schema.JSON
+
+# git config
+.gitignore
